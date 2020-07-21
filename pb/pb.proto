@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package pb;
+
+message HelloRequest{
+  int32 Id = 1;
+  string Msg = 2;
+}
+
+message HelloResponse{
+  string Msg = 1;
+}
+
+service HelloService{
+  rpc SayHello(HelloRequest) returns (HelloResponse) {};
+}
+
+
+message VideoFilterReq {
+  string  UserId = 1;
+  repeated string  Videos = 2;
+  int64 Timestamp = 3;
+}
+
+message VideoFilterResp {
+  BaseResponse BaseResponse = 1;
+  string  UserId = 2;
+  repeated string  Videos = 3;
+}
+
+service  VideoFilterService{
+  rpc  VideoFilter(VideoFilterReq) returns (VideoFilterResp) {};
+}
+
+message BaseResponse{
+  int32  Code = 1;      // 2000 成功  4000 参数错误  5000 服务端错误
+  string Message = 2;   // 文字描述
+  int64  Timestamp = 3; // 时间戳
+}
+
+
+// 3.1 version
+
+// 核心能力指标请求参数
+message  CoreIndicatorReq {
+  string  UserId = 1;
+  int32  Level = 2;
+
+}
+
+// 核心能力指标相应参数
+message CoreIndicatorResp {
+  BaseResponse BaseResponse = 1;  //基础信息
+  int32 TotalWord = 2;            //单词个数
+  int32 Listened = 3;             //听过
+  int32 Familiarity = 4;          //熟悉
+  int32 Skilled = 5;              //熟练
+}
+
+
+//其他统计参数
+message  OtherStatisticsReq {
+  string  UserId = 1;
+}
+//其他统计参数
+message OtherStatisticsResp {
+  BaseResponse BaseResponse = 1;
+  int32 LearnVideo = 2;   //已学视频
+  int32 OralPractice = 3; //口语练习
+  int32 ListenedWord = 4; //听过的词汇
+  int32 OutputWord = 5; //输出的词汇
+  int32 ListenedSentence = 6; //听过的句子
+  int32 OutputSentence = 7; //输出的句子
+}
+
+// 学习日历
+message EverydayLearnInfoReq {
+  string  UserId = 1;
+  int64  Timestamp = 2;  // 当天 0时 时戳
+}
+message EverydayLearnInfoResp {
+  BaseResponse BaseResponse = 1;
+  int32 LearnVideo = 2;
+  int32 OralPractice = 3;
+  int32 ListenedWord = 4;
+  int32 OutputWord = 5;
+  int32 ListenedSentence = 6;
+  int32 OutputSentence = 7;
+}
+
+// 级别知识点
+message LevelKnowledgePointReq {
+  string  UserId = 1;
+  int32  Level = 2;
+  int32  IsCover = 3;  //默认 0 不包含
+}
+message LevelKnowledgePointResp{
+  BaseResponse BaseResponse = 1;
+  int32 Word = 2;
+  int32 TotalWord = 3;
+}
+
+
+// 词汇
+message LevelWordReq {
+  string  UserId = 1;
+  int32 WordLevel = 2;
+  string Flag = 3;
+  TypeEnum Type = 4; //  默认 待学习 0、 听过 1、 熟悉 2、熟练 3
+
+  enum TypeEnum {
+    Default = 0;
+    Listened = 1;
+    Familiarity = 2;
+    Skilled = 3;
+  }
+}
+message LevelWordResp {
+  BaseResponse BaseResponse = 1;
+  repeated  string  Word = 2;
+  string Flag = 3;
+}
+service UserLearnInfoService {
+  rpc CoreIndicator(CoreIndicatorReq) returns (CoreIndicatorResp) {}; //首页核心指标
+  rpc OtherStatistics(OtherStatisticsReq) returns (OtherStatisticsResp) {};  //其他统计
+  rpc EverydayLearnInfo(EverydayLearnInfoReq) returns (EverydayLearnInfoResp){};  //学习日历
+  rpc LevelKnowledgePoint(LevelKnowledgePointReq) returns (LevelKnowledgePointResp){}; //级别知识点
+  rpc LevelWorld(LevelWordReq) returns (LevelWordResp){};
+}
